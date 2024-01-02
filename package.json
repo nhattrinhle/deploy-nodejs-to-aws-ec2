@@ -1,0 +1,47 @@
+{
+    "name": "deploy-nodejs-to-aws-ec2",
+    "version": "1.0.0",
+    "description": "",
+    "main": "server.js",
+    "engines": {
+        "node": "20.9.0"
+    },
+    "scripts": {
+        "dev": "cross-env NODE_ENV=development nodemon server.js",
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "lint": "eslint .",
+        "lint:fix": "eslint . --fix",
+        "prettier": "prettier --check **/*.js",
+        "prettier:fix": "prettier --write **/*.js"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/nhattrinhle/deploy-nodejs-to-aws-ec2.git"
+    },
+    "keywords": [
+        "aws",
+        "ec2",
+        "nodejs"
+    ],
+    "author": "nhattrinhle",
+    "license": "ISC",
+    "bugs": {
+        "url": "https://github.com/nhattrinhle/deploy-nodejs-to-aws-ec2/issues"
+    },
+    "homepage": "https://github.com/nhattrinhle/deploy-nodejs-to-aws-ec2#readme",
+    "dependencies": {
+        "cross-env": "^7.0.3",
+        "express": "^4.18.2"
+    },
+    "devDependencies": {
+        "eslint": "8.56.0",
+        "eslint-config-airbnb-base": "15.0.0",
+        "eslint-config-prettier": "9.1.0",
+        "eslint-plugin-import": "2.29.1",
+        "eslint-plugin-jest": "27.6.1",
+        "eslint-plugin-prettier": "5.1.2",
+        "jest": "29.7.0",
+        "nodemon": "3.0.2",
+        "prettier": "^3.1.1"
+    }
+}

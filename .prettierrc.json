@@ -1,0 +1,12 @@
+{
+    "singleQuote": true,
+    "printWidth": 120,
+    "tabWidth": 4,
+    "quoteProps": "preserve",
+    "bracketSpacing": true,
+    "arrowParens": "always",
+    "requirePragma": false,
+    "endOfLine": "crlf",
+    "semi": false,
+    "trailingComma": "none"
+}
