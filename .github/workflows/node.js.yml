@@ -24,4 +24,7 @@ jobs:
                   node-version: ${{ matrix.node-version }}
                   cache: 'npm'
             - run: npm ci
+            - run: 
+                    touch .env
+                    echo "${{ secrets.DEPLOY_NODE_AWS_KEYS}}" > .env
             - run: pm2 restart nodeserver
