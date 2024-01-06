@@ -31,6 +31,7 @@
     },
     "homepage": "https://github.com/nhattrinhle/deploy-nodejs-to-aws-ec2#readme",
     "dependencies": {
+        "bcrypt": "^5.1.1",
         "compression": "^1.7.4",
         "cors": "^2.8.5",
         "cross-env": "^7.0.3",
@@ -41,6 +42,7 @@
         "joi": "^17.11.0",
         "mongoose": "^8.0.3",
         "morgan": "^1.10.0",
+        "validator": "^13.11.0",
         "winston": "^3.11.0"
     },
     "devDependencies": {
