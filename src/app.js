@@ -1,12 +1,17 @@
 const express = require('express')
 const cors = require('cors')
-const morgan = require('morgan')
+// const morgan = require('morgan')
 const helmet = require('helmet')
+const morgan = require('./config/morgan')
+const config = require('./config/config')
 
 const app = express()
 
 // init middlewares
-app.use(morgan('dev'))
+if (config.env !== 'test') {
+    app.use(morgan.successHandler)
+    app.use(morgan.errorHandler)
+}
 
 // set security http headers
 app.use(helmet())
