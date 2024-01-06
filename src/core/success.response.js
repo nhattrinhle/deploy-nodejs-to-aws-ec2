@@ -1,7 +1,7 @@
 const { StatusCodes, ReasonPhrases } = require('../utils/httpStatusCode')
 
 class SuccessResponse {
-    constructor({ statusCode = StatusCodes.OK, message, reasonStatusCode = ReasonPhrases.OK, metaData = {} }) {
+    constructor({ message, statusCode = StatusCodes.OK, reasonStatusCode = ReasonPhrases.OK, metaData = {} }) {
         this.status = statusCode
         this.message = message || reasonStatusCode
         this.metaData = metaData
@@ -19,8 +19,8 @@ class OK extends SuccessResponse {
 }
 
 class Created extends SuccessResponse {
-    constructor({ statusCode = StatusCodes.CREATED, message, reasonStatusCode = ReasonPhrases.CREATED, metaData }) {
-        super({ statusCode, message, reasonStatusCode, metaData })
+    constructor({ message, statusCode = StatusCodes.CREATED, reasonStatusCode = ReasonPhrases.CREATED, metaData }) {
+        super({ message, statusCode, reasonStatusCode, metaData })
     }
 }
 
