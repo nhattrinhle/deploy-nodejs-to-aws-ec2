@@ -21,6 +21,9 @@ app.use(express.urlencoded({ extended: true }))
 app.use(cors())
 app.options('*', cors())
 
+// init db
+require('./dbs/mongodb.init')
+
 // router
 app.use(require('./routes'))
 
