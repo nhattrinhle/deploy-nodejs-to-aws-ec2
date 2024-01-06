@@ -1,5 +1,6 @@
 const mongoose = require('mongoose')
 const config = require('../config/config')
+const logger = require('../config/logger')
 
 class Database {
     constructor() {
@@ -15,9 +16,9 @@ class Database {
                 mongoose.set('debug', { color: true })
             }
             await mongoose.connect(connectionString)
-            console.log('Connected to MongoDB successfully!')
+            logger.info('Connected to MongoDB successfully!')
         } catch (error) {
-            console.error('Failed to connect to MongoDB:', error.message)
+            logger.error('Failed to connect to MongoDB:', error.message)
         }
     }
 
