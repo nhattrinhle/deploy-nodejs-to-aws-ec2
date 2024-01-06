@@ -1,15 +1,11 @@
 const express = require('express')
-const { SuccessResponse } = require('../../core/success.response')
+const { authController } = require('../../controllers')
+const asyncHandler = require('../../utils/asyncHandler')
+const validate = require('../../middlewares/validate')
+const { authValidation } = require('../../validations')
 
 const router = express.Router()
 
-router.get('/', (_req, res, _next) => {
-    new SuccessResponse({
-        message: 'OK',
-        metaData: {
-            name: 'Le Nhat Trinh'
-        }
-    }).send(res)
-})
+router.post('/register', validate(authValidation.register), asyncHandler(authController.register))
 
 module.exports = router
