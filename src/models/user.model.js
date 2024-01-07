@@ -78,6 +78,15 @@ userSchema.statics.isEmailTaken = async function (email) {
     return !!(await this.findOne({ email }).lean())
 }
 
+/**
+ *
+ * @param {string} password
+ * @returns {Promise<Boolean>}
+ */
+userSchema.methods.isPasswordMatch = async function (password) {
+    return bcrypt.compare(password, this.password)
+}
+
 userSchema.pre('save', async function (next) {
     if (this.isModified('password')) {
         this.password = await bcrypt.hash(this.password, SALT_ROUND)
