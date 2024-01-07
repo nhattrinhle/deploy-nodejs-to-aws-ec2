@@ -27,6 +27,21 @@ const createUser = async (userBody) => {
     return { newUser, tokens }
 }
 
+/**
+ *
+ * @param {string} email
+ * @returns {Promise<User>}
+ */
+const getUserByEmail = async (email) => {
+    const user = await User.findOne({ email })
+    if (!user) {
+        throw new BadRequestError('User not registered!')
+    }
+
+    return user
+}
+
 module.exports = {
-    createUser
+    createUser,
+    getUserByEmail
 }
