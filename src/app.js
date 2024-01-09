@@ -1,6 +1,5 @@
 const express = require('express')
 const cors = require('cors')
-// const morgan = require('morgan')
 const helmet = require('helmet')
 const morgan = require('./config/morgan')
 const config = require('./config/config')
@@ -46,6 +45,11 @@ app.use((error, _req, res, _next) => {
             message: error.message || 'Internal Server Error'
         }
     }
+
+    if (config.env === 'development') {
+        response.error.stack = error.stack
+    }
+
     return res.status(statusCode).send(response)
 })
 

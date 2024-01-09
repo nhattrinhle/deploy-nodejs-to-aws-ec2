@@ -1,14 +1,21 @@
 const { User } = require('../models')
 const { BadRequestError } = require('../core/error.response')
-const { generateUserToken } = require('./token.service')
+const { createOrUpdateUserKey, generateUserKeyPair } = require('./token.service')
 
 /**
  * Create a user
  * @param {Object} userBody
- * @returns {Promise<User, Token>}
+ * @returns {Promise<{ User }>}
  */
 const createUser = async (userBody) => {
-    const isEmailTaken = await User.isEmailTaken(userBody.email)
+    const { username, email } = userBody
+
+    const isUsernameTaken = await User.isUsernameTaken(username)
+    if (isUsernameTaken) {
+        throw new BadRequestError('Username already taken')
+    }
+
+    const isEmailTaken = await User.isEmailTaken(email)
     if (isEmailTaken) {
         throw new BadRequestError('Email already taken')
     }
@@ -18,30 +25,16 @@ const createUser = async (userBody) => {
         throw new BadRequestError('Register failed')
     }
 
-    const { _id: userId, email } = newUser
-    const tokens = await generateUserToken(userId, email)
-    if (!tokens) {
-        throw new BadRequestError('Creating tokens failed')
+    const { _id: userId } = newUser
+    const { privateKey, publicKey } = generateUserKeyPair()
+    const newUserKey = await createOrUpdateUserKey({ userId, privateKey, publicKey })
+    if (!newUserKey) {
+        throw new BadRequestError('Creating user key failed')
     }
 
-    return { newUser, tokens }
-}
-
-/**
- *
- * @param {string} email
- * @returns {Promise<User>}
- */
-const getUserByEmail = async (email) => {
-    const user = await User.findOne({ email })
-    if (!user) {
-        throw new BadRequestError('User not registered!')
-    }
-
-    return user
+    return { newUser }
 }
 
 module.exports = {
-    createUser,
-    getUserByEmail
+    createUser
 }

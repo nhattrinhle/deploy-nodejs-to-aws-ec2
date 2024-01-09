@@ -11,14 +11,19 @@ const tokenSchema = new Schema(
             required: true,
             unique: true
         },
+        privateKey: {
+            type: String,
+            required: true
+        },
         publicKey: {
             type: String,
             required: true
         },
         refreshToken: {
-            type: String
+            type: Array,
+            default: []
         },
-        refreshTokenUsed: {
+        refreshTokensUsed: {
             type: Array,
             default: []
         }

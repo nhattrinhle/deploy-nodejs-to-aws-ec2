@@ -79,6 +79,15 @@ userSchema.statics.isEmailTaken = async function (email) {
 }
 
 /**
+ * Check if username is taken
+ * @param {string} username
+ * @returns {Promise<boolean}
+ */
+userSchema.statics.isUsernameTaken = async function (username) {
+    return !!(await this.findOne({ username }).lean())
+}
+
+/**
  *
  * @param {string} password
  * @returns {Promise<Boolean>}
