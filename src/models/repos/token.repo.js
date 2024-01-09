@@ -2,7 +2,7 @@ const Token = require('../token.model')
 const { convertToObjectId } = require('../../utils')
 
 const updateUserTokens = async (userId, newRefreshToken) => {
-    const updatedToken = await Token.findOneAndUpdate({ user: userId }, { $push: { refreshToken: newRefreshToken } })
+    const updatedToken = await Token.findOneAndUpdate({ user: userId }, { $push: { refreshTokens: newRefreshToken } })
 
     return updatedToken
 }

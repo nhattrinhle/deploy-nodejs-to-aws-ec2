@@ -19,4 +19,6 @@ router.get('/checkAuth', (req, res, next) => {
     })
 })
 
+router.post('/refreshToken', asyncHandler(authController.refreshUserTokens))
+
 module.exports = router

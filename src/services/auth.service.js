@@ -1,6 +1,6 @@
 const { AuthFailureError, ForbiddenError, NotFoundError } = require('../core/error.response')
-const { userRepo } = require('../models/repos')
-const { createAuthTokens, deleteUserTokens, updateUserRefreshTokens } = require('./token.service')
+const { userRepo, tokenRepo } = require('../models/repos')
+const { createAuthTokens, deleteUserTokens, updateUserRefreshTokens, generateTokens } = require('./token.service')
 const { BadRequestError } = require('../core/error.response')
 
 const loginWithEmailAndPassword = async (email, password) => {
@@ -33,9 +33,21 @@ const refreshTokens = async ({ user, refreshToken, refreshTokensUsed }) => {
         throw new AuthFailureError('User not registered!')
     }
 
-    const newTokens = await createAuthTokens({ userId, email, refreshToken })
+    const userPrivateKey = await tokenRepo.getUserPrivateKeyByUserId(userId)
+    if (!userPrivateKey) {
+        throw new AuthFailureError('Something went wrong. Please login against')
+    }
 
-    const updated = await updateUserRefreshTokens({ userId, newTokens, refreshTokenUsed: refreshToken })
+    const newTokens = await generateTokens({ payload: { userId, email }, privateKey: userPrivateKey })
+    if (!newTokens) {
+        throw new BadRequestError('Generate new access token failed')
+    }
+
+    const updated = await updateUserRefreshTokens({
+        userId,
+        oldRefreshToken: refreshToken,
+        newRefreshToken: newTokens.refreshToken
+    })
     if (!updated) {
         throw new BadRequestError('Something wrong happen!!')
     }
