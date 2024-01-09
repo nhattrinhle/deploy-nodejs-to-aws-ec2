@@ -27,7 +27,7 @@ const authentication = async (req, res, next) => {
 
         const userTokens = await tokenService.findUserTokens(userId)
         if (!userTokens) {
-            throw new AuthFailureError('Not found user keys')
+            throw new AuthFailureError('Your account is not active. Please check your emails')
         }
 
         const { publicKey: userPublicKey, refreshTokens: userRefreshTokens } = userTokens

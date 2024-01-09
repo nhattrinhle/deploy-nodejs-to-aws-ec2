@@ -2,7 +2,7 @@ const JWT = require('jsonwebtoken')
 const { generateKeyPairSync } = require('node:crypto')
 const config = require('../config/config')
 const Token = require('../models/token.model')
-const { BadRequestError, NotFoundError } = require('../core/error.response')
+const { BadRequestError, NotFoundError, AuthFailureError } = require('../core/error.response')
 const { convertToObjectId } = require('../utils')
 const { tokenRepo } = require('../models/repos')
 
@@ -114,7 +114,7 @@ const findUserTokens = async (userId) => {
         { publicKey: 1, refreshTokens: 1, refreshTokensUsed: 1 }
     ).lean()
     if (!foundTokens) {
-        throw new BadRequestError('Not found user keys')
+        throw new AuthFailureError('Your account is not active. Please check your emails')
     }
 
     return foundTokens

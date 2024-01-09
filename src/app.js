@@ -3,6 +3,7 @@ const cors = require('cors')
 const helmet = require('helmet')
 const morgan = require('./config/morgan')
 const config = require('./config/config')
+const { errorHandler } = require('./middlewares/handlerError')
 
 const app = express()
 
@@ -37,20 +38,6 @@ app.use((_req, _res, next) => {
     next(error)
 })
 
-app.use((error, _req, res, _next) => {
-    const statusCode = error.status || 500
-    const response = {
-        error: {
-            status: statusCode,
-            message: error.message || 'Internal Server Error'
-        }
-    }
-
-    if (config.env === 'development') {
-        response.error.stack = error.stack
-    }
-
-    return res.status(statusCode).send(response)
-})
+app.use(errorHandler)
 
 module.exports = app
