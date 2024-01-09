@@ -1,27 +1,25 @@
 const winston = require('winston')
 const config = require('./config')
 
+const { combine, splat, printf, colorize, uncolorize, timestamp } = winston.format
 const isDevelopment = config.env === 'development'
-
-const enumerateErrorFormat = winston.format((info) => {
-    if (info instanceof Error) {
-        Object.assign(info, { message: info.stack })
-    }
-
-    return info
-})
 
 const logger = winston.createLogger({
     level: isDevelopment ? 'debug' : 'info',
-    format: winston.format.combine(
-        enumerateErrorFormat(),
-        isDevelopment ? winston.format.colorize() : winston.format.uncolorize(),
-        winston.format.splat(),
-        winston.format.printf(({ level, message }) => `${level} : ${message}`)
+    format: combine(
+        timestamp({
+            format: 'YYYY-MM-DD hh:mm:ss.SSS A'
+        }),
+        colorize(),
+        splat(),
+        printf((info) => `[${info.timestamp}] ${info.level}: ${info.message}`)
     ),
     transports: [
-        new winston.transports.Console({
-            stderrLevels: ['error']
+        new winston.transports.Console(),
+        new winston.transports.File({
+            dirname: 'logs',
+            filename: 'tlshop.log',
+            format: combine(uncolorize())
         })
     ]
 })
