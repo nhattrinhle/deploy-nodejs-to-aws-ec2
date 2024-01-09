@@ -33,7 +33,7 @@ const generateUserKeyPair = () => {
  * @param {string}  tokensInfo.publicKey
  * @returns {Object<String>} storedPublicKey
  */
-const createOrUpdateUserKey = async ({ userId, privateKey, publicKey }) => {
+const createNewUserKey = async ({ userId, privateKey, publicKey }) => {
     const filter = {
         user: userId
     }
@@ -95,6 +95,11 @@ const createAuthTokens = async (userId, email) => {
         throw new BadRequestError('Creating tokens failed')
     }
 
+    const updatedUserTokens = await tokenRepo.updateUserTokens(userId, tokens.refreshToken)
+    if (!updatedUserTokens) {
+        throw new BadRequestError('Updated refreshToken failed ')
+    }
+
     return tokens
 }
 
@@ -104,19 +109,15 @@ const createAuthTokens = async (userId, email) => {
  * @returns {Object}
  */
 const findUserTokens = async (userId) => {
-    try {
-        const foundTokens = await Token.findOne(
-            { user: convertToObjectId(userId) },
-            { publicKey: 1, refreshToken: 1, refreshTokensUsed: 1 }
-        ).lean()
-        if (!foundTokens) {
-            throw new BadRequestError('Not found user keys')
-        }
-
-        return foundTokens
-    } catch (error) {
+    const foundTokens = await Token.findOne(
+        { user: convertToObjectId(userId) },
+        { publicKey: 1, refreshTokens: 1, refreshTokensUsed: 1 }
+    ).lean()
+    if (!foundTokens) {
         throw new BadRequestError('Not found user keys')
     }
+
+    return foundTokens
 }
 
 /**
@@ -152,5 +153,5 @@ module.exports = {
     findUserTokens,
     deleteUserTokens,
     updateUserRefreshTokens,
-    createOrUpdateUserKey
+    createNewUserKey
 }

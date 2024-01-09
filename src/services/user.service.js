@@ -1,6 +1,6 @@
 const { User } = require('../models')
 const { BadRequestError } = require('../core/error.response')
-const { createOrUpdateUserKey, generateUserKeyPair } = require('./token.service')
+const { createNewUserKey, generateUserKeyPair } = require('./token.service')
 
 /**
  * Create a user
@@ -27,7 +27,7 @@ const createUser = async (userBody) => {
 
     const { _id: userId } = newUser
     const { privateKey, publicKey } = generateUserKeyPair()
-    const newUserKey = await createOrUpdateUserKey({ userId, privateKey, publicKey })
+    const newUserKey = await createNewUserKey({ userId, privateKey, publicKey })
     if (!newUserKey) {
         throw new BadRequestError('Creating user key failed')
     }
