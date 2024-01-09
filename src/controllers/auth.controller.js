@@ -19,7 +19,21 @@ const login = async (req, res) => {
     }).send(res)
 }
 
+const refreshUserTokens = async (req, res) => {
+    const { user, refreshToken, userTokens } = req
+    const newTokens = await authService.refreshTokens({
+        user,
+        refreshToken,
+        refreshTokensUsed: userTokens.refreshTokensUsed
+    })
+    return new OK({
+        message: 'Generate new tokens success',
+        metaData: newTokens
+    }).send(res)
+}
+
 module.exports = {
     register,
-    login
+    login,
+    refreshUserTokens
 }

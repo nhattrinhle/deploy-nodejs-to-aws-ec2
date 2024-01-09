@@ -1,5 +1,5 @@
 const JWT = require('jsonwebtoken')
-const { AuthFailureError } = require('../core/error.response')
+const { AuthFailureError, ForbiddenError } = require('../core/error.response')
 const { tokenService } = require('../services')
 const { userRepo } = require('../models/repos')
 
@@ -12,6 +12,9 @@ const HEADER = {
 const authentication = async (req, res, next) => {
     try {
         const userId = req.headers[HEADER.USER_ID]
+        const refreshToken = req.headers[HEADER.REFRESH_TOKEN]
+        const accessToken = req.headers[HEADER.AUTHORIZATION]
+
         if (!userId) {
             throw new AuthFailureError('Invalid request')
         }
@@ -27,10 +30,15 @@ const authentication = async (req, res, next) => {
             throw new AuthFailureError('Not found user keys')
         }
 
-        const { publicKey: userPublicKey } = userTokens
-        const refreshToken = req.headers[HEADER.REFRESH_TOKEN]
+        const { publicKey: userPublicKey, refreshTokens: userRefreshTokens } = userTokens
 
-        if (refreshToken && userTokens.refreshTokens.include(refreshToken)) {
+        if (refreshToken) {
+            if (!userRefreshTokens.includes(refreshToken)) {
+                await tokenService.deleteUserTokens(userId)
+                throw new ForbiddenError('Something wrong happen! Please login against!')
+                // MAIL REPORT
+            }
+
             const decodeUser = JWT.verify(refreshToken, userPublicKey)
             if (userId !== decodeUser.payload.userId) {
                 throw new AuthFailureError('Invalid UserId')
@@ -43,7 +51,6 @@ const authentication = async (req, res, next) => {
             return next()
         }
 
-        const accessToken = req.headers[HEADER.AUTHORIZATION]
         if (!accessToken) {
             throw new AuthFailureError('Invalid Request')
         }

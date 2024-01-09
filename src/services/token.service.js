@@ -130,20 +130,25 @@ const deleteUserTokens = async (userId) => {
     return result
 }
 
-const updateUserRefreshTokens = async ({ userId, newTokens, refreshTokenUsed }) => {
-    const result = await Token.updateOne(
-        { user: userId },
-        {
-            $set: {
-                refreshToken: newTokens.refreshToken
-            },
-            $addToSet: {
-                refreshTokensUsed: refreshTokenUsed
-            }
-        }
-    )
+const updateUserRefreshTokens = async ({ userId, oldRefreshToken, newRefreshToken }) => {
+    const filter = { user: userId }
+    const pullUpdate = {
+        $pull: { refreshTokens: oldRefreshToken }
+    }
+    await Token.findOneAndUpdate(filter, pullUpdate)
 
-    return result
+    const pushUpdate = {
+        $push: {
+            refreshTokensUsed: oldRefreshToken,
+            refreshTokens: newRefreshToken
+        }
+    }
+
+    const updated = await Token.findOneAndUpdate(filter, pushUpdate, {
+        new: true
+    })
+
+    return updated
 }
 
 module.exports = {
