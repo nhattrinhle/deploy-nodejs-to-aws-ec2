@@ -78,10 +78,9 @@ const generateTokens = async ({ payload, privateKey }) => {
 }
 
 /**
- * Generate a new RSA key pair, store the public key, and generate access and refresh tokens for a user
+ * Create accessToken and refreshToken for a user
  * @param {String} userId
  * @param {String} email
- * @param {String} refreshToken
  * @returns {Object}
  */
 const createAuthTokens = async (userId, email) => {

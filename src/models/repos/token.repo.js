@@ -10,7 +10,7 @@ const updateUserTokens = async (userId, newRefreshToken) => {
 const getUserPrivateKeyByUserId = async (userId) => {
     const userTokens = await Token.findOne({ user: convertToObjectId(userId) }).lean()
 
-    return userTokens.privateKey
+    return userTokens?.privateKey
 }
 
 module.exports = {
