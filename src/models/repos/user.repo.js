@@ -13,8 +13,13 @@ const getUserDocumentByEmail = async (email) => {
     return User.findOne({ email })
 }
 
+const getUserDocumentById = async (userId) => {
+    return User.findOne({ _id: convertToObjectId(userId) })
+}
+
 module.exports = {
     getUserObjById,
     getUserObjByEmail,
+    getUserDocumentById,
     getUserDocumentByEmail
 }
