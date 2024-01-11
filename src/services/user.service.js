@@ -1,6 +1,8 @@
 const { User } = require('../models')
 const { BadRequestError } = require('../core/error.response')
 const { createNewUserKey, generateUserKeyPair } = require('./token.service')
+const { generateVerifyEmailToken } = require('../utils')
+const { sendVerificationEmail } = require('./email.service')
 
 /**
  * Create a user
@@ -30,6 +32,21 @@ const createUser = async (userBody) => {
     const newUserKey = await createNewUserKey({ userId, privateKey, publicKey })
     if (!newUserKey) {
         throw new BadRequestError('Creating user key failed')
+    }
+
+    const { uniqueString, hashUniqueString } = await generateVerifyEmailToken(userId)
+
+    await newUser.updateOne({
+        emailVerificationCode: {
+            code: hashUniqueString,
+            createdAt: Date.now(),
+            expiresAt: Date.now() + 30 * 60 * 1000
+        }
+    })
+
+    const sentEmail = await sendVerificationEmail({ userId, email, token: uniqueString })
+    if (!sentEmail) {
+        throw new BadRequestError('An error occurred when sent verification email to your email address')
     }
 
     return { newUser }
