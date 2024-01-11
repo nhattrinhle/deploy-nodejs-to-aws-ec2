@@ -8,10 +8,14 @@ const { userRepo } = require('../models/repos')
 const transporter = nodemailer.createTransport({
     host: config.email.smtp.host,
     port: config.email.smtp.port,
-    secure: false,
+    secure: true,
+    secureConnection: false,
     auth: {
         user: config.email.smtp.auth.user,
         pass: config.email.smtp.auth.pass
+    },
+    tls: {
+        rejectUnauthorized: true
     }
 })
 
