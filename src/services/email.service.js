@@ -2,8 +2,13 @@ const nodemailer = require('nodemailer')
 const bcrypt = require('bcrypt')
 const config = require('../config/config')
 const logger = require('../config/logger')
-const { BadRequestError, NotFoundError, AuthFailureError } = require('../core/error.response')
+const { BadRequestError, NotFoundError, AuthFailureError, FailedDependenciesError } = require('../core/error.response')
 const { userRepo } = require('../models/repos')
+
+const emailConfig = {
+    from: config.email.from,
+    verificationUrl: config.email.verificationUrl
+}
 
 const transporter = nodemailer.createTransport({
     host: config.email.smtp.host,
@@ -36,12 +41,13 @@ const sendEmail = async ({ to, subject, text, html }) => {
     }
 
     const msg = { from: config.email.from, to, subject, text, html }
-    const sent = await transporter.sendMail(msg)
-    if (!sent) {
-        throw new BadRequestError('Error sending to email address')
+    const info = await transporter.sendMail(msg)
+
+    if (!info.messageId) {
+        throw new FailedDependenciesError('Error sending email')
     }
 
-    return sent
+    return info
 }
 
 /**
@@ -52,7 +58,7 @@ const sendEmail = async ({ to, subject, text, html }) => {
  */
 const sendVerificationEmail = async ({ userId, email, token }) => {
     const subject = 'Email Verification'
-    const verificationEmailUrl = `http://localhost:3000/v1/api/email/verify-email/${userId}/${token}`
+    const verificationEmailUrl = `${emailConfig.verificationUrl}/${userId}/${token}`
     const text = `Dear user,
     To verify your email, click on this link: ${verificationEmailUrl}. If you did not create an account, then ignore this email.`
     const html = `<p> Dear user, </p>
@@ -62,7 +68,7 @@ const sendVerificationEmail = async ({ userId, email, token }) => {
 
     const info = await sendEmail({ to: email, subject, text, html })
     if (!info) {
-        throw new BadRequestError('Error sending to email address')
+        throw new FailedDependenciesError('Error sending verification email')
     }
 
     return info
@@ -74,24 +80,25 @@ const verifyEmail = async (userId, token) => {
         throw new NotFoundError('Email not registered')
     }
 
-    const verificationCode = foundUser.emailVerificationCode
-    if (!verificationCode && foundUser.isEmailVerified) {
+    const { verificationEmail, isEmailVerified } = foundUser
+
+    if (!verificationEmail && isEmailVerified) {
         throw new BadRequestError('Account does not need to verification email!')
     }
 
-    const { code: userVerificationCode, expiresAt } = verificationCode
-    if (!userVerificationCode) {
+    const { code, expiresAt } = verificationEmail
+    if (!code) {
         throw new AuthFailureError('An error occurred when verify your email address!')
     }
 
     if (expiresAt < Date.now()) {
-        await foundUser.updateOne({ emailVerificationCode: null })
-        throw new AuthFailureError('Your email verification link has expired! Please inbox!')
+        await foundUser.updateOne({ $unset: { verificationEmail: 1 } })
+        throw new BadRequestError('Your email verification link has expired! Please inbox!')
     }
 
-    const isMatchToken = bcrypt.compare(userVerificationCode, token)
-    if (!isMatchToken) {
-        throw new AuthFailureError(
+    const isTokenMatch = await bcrypt.compare(token, code)
+    if (!isTokenMatch) {
+        throw new BadRequestError(
             'An error occurred when verify your email address! User verification link is incorrect'
         )
     }
@@ -102,7 +109,7 @@ const verifyEmail = async (userId, token) => {
             isEmailVerified: true
         },
         $unset: {
-            emailVerificationCode: 1
+            verificationEmail: 1
         }
     })
 

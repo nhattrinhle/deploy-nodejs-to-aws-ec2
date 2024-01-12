@@ -20,7 +20,7 @@ const addressSchema = new Schema(
     }
 )
 
-const verificationEmailCodeSchema = new Schema(
+const verificationEmailSchema = new Schema(
     {
         code: String,
         createdAt: Date,
@@ -73,7 +73,7 @@ const userSchema = new Schema(
             type: Boolean,
             default: false
         },
-        emailVerificationCode: verificationEmailCodeSchema
+        verificationEmail: verificationEmailSchema
     },
     {
         timestamps: true,

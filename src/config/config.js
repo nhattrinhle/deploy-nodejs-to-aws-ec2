@@ -11,11 +11,17 @@ const envVarsSchema = Joi.object()
         MONGODB_CONNECTION_URL: Joi.string().required().description('Mongo DB url'),
         JWT_ACCESS_EXPIRATION_MINUTES: Joi.number().default(30).description('minutes after which access tokens expire'),
         JWT_REFRESH_EXPIRATION_DAYS: Joi.number().default(30).description('days after which refresh tokens expire'),
-        SMTP_HOST: Joi.string().description('server that will send the emails'),
-        SMTP_PORT: Joi.number().description('port to connect to the email server'),
-        EMAIL_USERNAME: Joi.string().description('username for email server'),
-        EMAIL_PASSWORD: Joi.string().description('password for email server'),
-        EMAIL_FROM: Joi.string().description('the from field in the emails sent by the app')
+        SMTP_HOST: Joi.string().required().description('server that will send the emails'),
+        SMTP_PORT: Joi.number().required().description('port to connect to the email server'),
+        EMAIL_USERNAME: Joi.string().required().description('username for email server'),
+        EMAIL_PASSWORD: Joi.string().required().description('password for email server'),
+        EMAIL_FROM: Joi.string().required().description('the from field in the emails sent by the app'),
+        PREFIX_EMAIL_VERIFICATION_URL_PRODUCT: Joi.string()
+            .required()
+            .description('the prefix url field use to verify email'),
+        PREFIX_EMAIL_VERIFICATION_URL_DEVELOPMENT: Joi.string()
+            .required()
+            .description('the prefix url field use to verify email')
     })
     .unknown()
 
@@ -49,6 +55,10 @@ module.exports = {
                 pass: envVars.EMAIL_PASSWORD
             }
         },
-        from: envVars.EMAIL_FROM
+        from: envVars.EMAIL_FROM,
+        verificationUrl:
+            envVars.NODE_ENV === 'production'
+                ? envVars.JWT_ACCESS_EXPIRATION_MINUTES
+                : envVars.PREFIX_EMAIL_VERIFICATION_URL_DEVELOPMENT
     }
 }

@@ -43,6 +43,12 @@ class TooManyRequestError extends ErrorResponse {
     }
 }
 
+class FailedDependenciesError extends ErrorResponse {
+    constructor(message = ReasonPhrases.FAILED_DEPENDENCY, statusCode = StatusCodes.FAILED_DEPENDENCY) {
+        super(message, statusCode)
+    }
+}
+
 module.exports = {
     ErrorResponse,
     BadRequestError,
@@ -50,5 +56,6 @@ module.exports = {
     ForbiddenError,
     NotFoundError,
     ConflictRequestError,
-    TooManyRequestError
+    TooManyRequestError,
+    FailedDependenciesError
 }

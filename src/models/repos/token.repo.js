@@ -13,7 +13,12 @@ const getUserPrivateKeyByUserId = async (userId) => {
     return userTokens?.privateKey
 }
 
+const deleteUserTokens = async (userId) => {
+    return Token.deleteOne({ user: convertToObjectId(userId) })
+}
+
 module.exports = {
     getUserPrivateKeyByUserId,
-    updateUserTokens
+    updateUserTokens,
+    deleteUserTokens
 }
