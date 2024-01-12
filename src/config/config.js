@@ -16,7 +16,7 @@ const envVarsSchema = Joi.object()
         EMAIL_USERNAME: Joi.string().required().description('username for email server'),
         EMAIL_PASSWORD: Joi.string().required().description('password for email server'),
         EMAIL_FROM: Joi.string().required().description('the from field in the emails sent by the app'),
-        PREFIX_EMAIL_VERIFICATION_URL_PRODUCT: Joi.string()
+        PREFIX_EMAIL_VERIFICATION_URL_PRODUCTION: Joi.string()
             .required()
             .description('the prefix url field use to verify email'),
         PREFIX_EMAIL_VERIFICATION_URL_DEVELOPMENT: Joi.string()
@@ -58,7 +58,7 @@ module.exports = {
         from: envVars.EMAIL_FROM,
         verificationUrl:
             envVars.NODE_ENV === 'production'
-                ? envVars.JWT_ACCESS_EXPIRATION_MINUTES
+                ? envVars.PREFIX_EMAIL_VERIFICATION_URL_PRODUCTION
                 : envVars.PREFIX_EMAIL_VERIFICATION_URL_DEVELOPMENT
     }
 }
